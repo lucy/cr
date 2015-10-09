@@ -7,9 +7,10 @@ html, body {
 
 body > div, .max {
   height: 100% !important;
-  min-height: 100% !important;
   width: 100% !important;
+  min-height: 100% !important;
   min-width: 100% !important;
+	overflow: visible;
 }
 
 img {

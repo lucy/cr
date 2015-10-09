@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <title>Comic Viewer</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="/bootstrap.min.css">
-  <script type="text/javascript" src="/elm.js"></script>
-</head>
-
-<body>
-<script type="text/javascript">
-var app = Elm.fullscreen(Elm.App);
+	<head>
+		<title>Comic Viewer</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="/style.css">
+		<link rel="stylesheet" href="/bootstrap.min.css">
+	</head>
+	<body>
+		<script type="text/javascript" src="/elm.js"></script>
+		<script type="text/javascript">
+var app = Elm.fullscreen(Elm.Main);
 app.ports.scrollTop.subscribe(function(state) {
 	window.scrollTo(0,0);
 });
@@ -20,7 +18,6 @@ app.ports.preloadImg.subscribe(function(url) {
 	var img = new Image();
 	img.src = url;
 });
-</script>
-</body>
-
+		</script>
+	</body>
 </html>
