@@ -140,11 +140,15 @@ update action model =
             (f model.pages model.page))
         diff = Set.diff s model.keys |> Set.toList
         m = {model | keys <- s}
-        f k = Debug.log (toString k) <| case k of
+        f k = case k of
           37 {- Left  -} -> toPage m <| model.page - 1
           39 {- Right -} -> toPage m <| model.page + 1
           38 {- Up    -} -> dd findNext
           40 {- Down  -} -> dd findPrev
+          72 {- h -} -> toPage m <| model.page - 1
+          76 {- l -} -> toPage m <| model.page + 1
+          75 {- k -} -> dd findNext
+          74 {- j -} -> dd findPrev
           80 {- P -} -> ({ m | showPath <- not m.showPath }, Effects.none)
           _ -> (m, Effects.none)
       in
