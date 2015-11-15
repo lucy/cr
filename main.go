@@ -75,14 +75,14 @@ func main() {
 	dir := flag.String("d", ".", "serve from this directory")
 	flag.Parse()
 	args := flag.Args()
-	fmt.Println("http://" + addr + "/viewer")
+	fmt.Println("http://" + addr)
 	http.Handle("/files/", http.StripPrefix("/files/", http.FileServer(http.Dir(*dir))))
 	http.Handle("/files.json", ReaderServer(args))
 	for _, f := range []struct {
 		from string
 		to   string
 	}{
-		{"/viewer/", "index.html"},
+		{"/", "index.html"},
 		{"/elm.js", "elm.js"},
 		{"/style.css", "style.css"},
 		{"/bootstrap.min.css", "bootstrap.min.css"},
