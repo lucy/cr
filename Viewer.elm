@@ -62,6 +62,7 @@ type alias Model =
   , uri : Maybe String
   , keys : Set.Set Keyboard.KeyCode
   , showPath : Bool
+  , pullDir : PullDir
   }
 
 type alias Page =
@@ -75,7 +76,7 @@ type View
   | ViewSingle
 
 init : (Model, Effects Action)
-init = (Model A.empty 0 Nothing Set.empty False, refresh)
+init = (Model A.empty 0 Nothing Set.empty False PullRight, refresh)
 
 inputs : List (Signal Action)
 inputs =
@@ -138,21 +139,24 @@ update action model =
           (model, Effects.none)
           (Maybe.map (toPage model)
             (f model.pages model.page))
+        next = toPage m <| model.page + 1
+        prev = toPage m <| model.page - 1
         diff = Set.diff s model.keys |> Set.toList
         m = {model | keys <- s}
-        f k = case k of
-          37 {- Left  -} -> toPage m <| model.page - 1
-          39 {- Right -} -> toPage m <| model.page + 1
+        k = (withDefault 0 <| List.head diff)
+      in
+        case k of
+          37 {- Left  -} -> prev
+          39 {- Right -} -> next
           38 {- Up    -} -> dd findNext
           40 {- Down  -} -> dd findPrev
-          72 {- h -} -> toPage m <| model.page - 1
-          76 {- l -} -> toPage m <| model.page + 1
+          72 {- h -} -> prev
+          76 {- l -} -> next
           75 {- k -} -> dd findNext
           74 {- j -} -> dd findPrev
-          80 {- P -} -> ({ m | showPath <- not m.showPath }, Effects.none)
+          80 {- p -} -> ({ m | showPath <- not m.showPath }, Effects.none)
+          68 {- d -} -> ({ m | pullDir <- dircycle m.pullDir}, Effects.none)
           _ -> (m, Effects.none)
-      in
-        f <| withDefault 0 <| List.head diff
 
 findNext : A.Array Page -> Int -> Maybe Int
 findNext a i = find (\i -> i + 1) i a
@@ -251,7 +255,7 @@ view addr m =
         ((List.map (\i -> li [] [text i]) inits) ++ [li [classes ["active"]] [text last]])
     main =
         withDefault (text "nothing")
-          <| Maybe.map (\url -> mImg addr url.path)
+          <| Maybe.map (\url -> mImg m.pullDir addr url.path)
             <| A.get m.page m.pages
     path1 = if m.showPath
       then Maybe.map
@@ -262,12 +266,26 @@ view addr m =
   div [classes ["max"]]
     (mc path1 [main])
 
-mImg : Signal.Address Action -> String -> Html
-mImg addr src =
+type PullDir
+    = PullLeft
+    | PullRight
+
+dirattr : PullDir -> String
+dirattr dir = case dir of
+    PullLeft  -> B.pullLeft
+    PullRight -> B.pullRight
+
+dircycle : PullDir -> PullDir
+dircycle dir = case dir of
+    PullLeft  -> PullRight
+    PullRight -> PullLeft
+
+mImg : PullDir -> Signal.Address Action -> String -> Html
+mImg dir addr src =
   img
     [ A.src (iurl ++ src)
     , E.onClick addr NextPage
-    , classes [B.pullRight, B.imgResponsive]
+    , classes [dirattr dir, B.imgResponsive]
     ]
     []
 
